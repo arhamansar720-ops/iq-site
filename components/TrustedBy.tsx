@@ -30,7 +30,7 @@ function MarqueeRow({ items, reverse = false }: { items: string[]; reverse?: boo
 const METRICS = [
   { value: 10000, suffix: "+", label: "Hours Optimized" },
   { value: 500000, suffix: "+", label: "Decisions Improved" },
-  { value: 6, suffix: "", label: "Intelligence Platforms" },
+  { value: 8, suffix: "", label: "Intelligence Platforms" },
   { value: 1, suffix: "", label: "Unified Ecosystem" },
 ];
 

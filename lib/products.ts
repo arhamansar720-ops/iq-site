@@ -1,4 +1,4 @@
-export type ProductVariant = "habits" | "drive" | "commute" | "receipts" | "life" | "finance";
+export type ProductVariant = "habits" | "drive" | "commute" | "receipts" | "life" | "finance" | "valet" | "rx";
 
 export type Product = {
   slug: string;
@@ -595,6 +595,198 @@ export const PRODUCTS: Product[] = [
       {
         q: "Can I get early access?",
         a: "Joining the waitlist on this page is the best way to hear first when early access opens.",
+      },
+    ],
+  },
+  {
+    slug: "iqvalet",
+    index: 7,
+    name: "IQValet",
+    category: "Valet Intelligence",
+    status: "live",
+    tagline: "Hand over your keys. Watch where they go.",
+    description:
+      "On-demand valet parking that connects drivers, valets, and venues on one live map.",
+    longDescription:
+      "IQValet turns valet parking into something you can actually see. A live map matches you with the nearest available valet and garage, then tracks your car from the moment you hand over your keys until the moment it comes back — no more wondering where it went or who has it.",
+    features: [
+      "On-demand valet requests",
+      "Live valet & garage map",
+      "Real-time trip tracking",
+      "Digital vehicle inspection",
+      "Cashless tip & payment",
+    ],
+    featureDetails: [
+      "See every nearby valet and garage on a live map and request a pickup in seconds — no phone call, no waiting at a stand.",
+      "Valets and garages appear as live pins before you even request, so you know who's close and how long the wait actually is.",
+      "From key handoff to return, your car's location updates in real time on the same map you requested from.",
+      "A timestamped photo walkaround runs before and after your car is valeted, so any new scuff or scratch has a clear record.",
+      "Pay and tip inside the app when your car comes back — no fumbling for cash at the stand.",
+    ],
+    stats: [
+      { label: "Valet IQ", value: "90" },
+      { label: "Avg. pickup time", value: "4m" },
+      { label: "Trips tracked", value: "38" },
+    ],
+    variant: "valet",
+    problem: {
+      headline: "Handing your keys to a stranger shouldn't feel like a leap of faith.",
+      body: "Traditional valet means giving up your car and hoping for the best — no idea where it's parked, who's driving it, or what condition it'll come back in. IQValet replaces the hope with a live map and a photo record, for exactly as long as someone else has your keys.",
+    },
+    howItWorks: {
+      title: "How IQValet actually works",
+      steps: [
+        {
+          title: "Request the nearest valet",
+          body: "The live map shows nearby valets and garages before you even request — pick one and a valet is on the way.",
+        },
+        {
+          title: "A walkaround, before anything moves",
+          body: "A quick photo inspection runs before handoff, so your car's condition is documented the moment it leaves your hands.",
+        },
+        {
+          title: "Tracked the whole way",
+          body: "From key handoff to the garage and back, your car's live location stays on your screen — never a black box.",
+        },
+        {
+          title: "Retrieve and pay in the app",
+          body: "Request your car back, watch it return live, and pay and tip in-app — no cash, no waiting at a stand.",
+        },
+      ],
+    },
+    signature: {
+      eyebrow: "The signature feature",
+      title: "Watch your car's exact route. Live.",
+      body: "Most valet services end the moment you hand over your keys — you get a ticket and a hope. IQValet keeps a live line to your car from the second it's out of your hands: where it's headed, when it's parked, and when it's on its way back. The same live-tracking instinct as a rideshare app, pointed at your own car.",
+      stat: { value: "Live", label: "GPS tracking from key handoff to return" },
+    },
+    underTheHood: {
+      title: "Built as one network, four ways in",
+      bullets: [
+        "One live dispatch layer connects the customer app, the valet's job app, the venue's business dashboard, and an operations console for garages running multiple locations.",
+        "Live location and map matching are built on MapKit, the same foundation as IQCommute's routing.",
+        "Every trip's photo walkaround is timestamped and stored with the trip record, not a separate system.",
+      ],
+    },
+    integration: {
+      title: "Connects to IQDrive and IQCommute",
+      body: "A trip where someone else is driving your car shouldn't count against you. IQValet tags valeted trips so IQDrive and IQCommute recognize them as valet-driven, keeping your own driving score and commute history accurate.",
+      links: ["iqdrive", "iqcommute"],
+    },
+    specs: [
+      { label: "Platform", value: "iOS" },
+      { label: "Live tracking", value: "MapKit, key handoff to return" },
+      { label: "Network", value: "Customer, valet, business, operations apps" },
+      { label: "Vehicle record", value: "Timestamped photo walkaround" },
+    ],
+    faq: [
+      {
+        q: "Can I see my car while it's parked, not just while it's moving?",
+        a: "Yes — your car's location stays visible on the live map for the entire time it's with a valet, whether it's in transit or parked.",
+      },
+      {
+        q: "What happens if there's new damage?",
+        a: "The before-and-after photo walkaround gives you a timestamped record to compare, so any new damage is easy to point to.",
+      },
+      {
+        q: "How do tips work?",
+        a: "Tipping happens in the app when your car is returned — no cash needed at the stand.",
+      },
+    ],
+  },
+  {
+    slug: "iqrx",
+    index: 8,
+    name: "IQrX",
+    category: "Pharmacy Intelligence",
+    status: "live",
+    tagline: "Every dose, sorted. Every refill, delivered.",
+    description:
+      "A smart pharmacy assistant that sorts every prescription by dose and brings refills to your door.",
+    longDescription:
+      "IQrX takes every prescription you're on and sorts it into Morning, Afternoon, Evening, and Night — so the question is never “which pills, when,” just “what's next.” When something needs a refill, IQrX handles the delivery too, tracked the same way as any modern delivery app.",
+    features: [
+      "Dose-bucket scheduling",
+      "Prescription management",
+      "Home delivery requests",
+      "Live delivery tracking",
+      "Refill reminders",
+    ],
+    featureDetails: [
+      "Every prescription is sorted automatically into Morning, Afternoon, Evening, or Night — no more cross-referencing five different bottles.",
+      "Add a prescription once — dose, frequency, refill count — and IQrX keeps it organized and current from then on.",
+      "Skip the pharmacy counter and request home delivery for any prescription that's running low.",
+      "Track every delivery from placed to packed to out for delivery to delivered, the same way you'd track any package.",
+      "Get reminded before a prescription actually runs out, not after you've already missed a dose.",
+    ],
+    stats: [
+      { label: "Adherence IQ", value: "87" },
+      { label: "Prescriptions tracked", value: "5" },
+      { label: "Avg. delivery time", value: "38m" },
+    ],
+    variant: "rx",
+    problem: {
+      headline: "Five prescriptions, four times a day, and no single place that tracks it.",
+      body: "Between morning pills, evening pills, and the ones that are supposed to come with food, most people are running their medication schedule from memory or a sticky note. IQrX turns that into four clear buckets a day and handles the refill errand for you.",
+    },
+    howItWorks: {
+      title: "How IQrX actually works",
+      steps: [
+        {
+          title: "Add a prescription once",
+          body: "Dose, frequency, and refill count go in once — IQrX takes it from there.",
+        },
+        {
+          title: "Sorted into four buckets",
+          body: "Morning, Afternoon, Evening, and Night — every prescription lands in the right slot automatically.",
+        },
+        {
+          title: "Request delivery instead of a pharmacy trip",
+          body: "When something's running low, request home delivery right from the app instead of making the trip yourself.",
+        },
+        {
+          title: "Tracked from placed to delivered",
+          body: "Watch your delivery move from placed → packed → out for delivery → delivered, live.",
+        },
+      ],
+    },
+    signature: {
+      eyebrow: "The signature feature",
+      title: "Four buckets. Zero guessing.",
+      body: "IQrX doesn't just list your prescriptions — it sorts every one of them into Morning, Afternoon, Evening, or Night based on how it's actually supposed to be taken. Open the app at any point in the day and the answer to “what do I take now” is already sorted for you.",
+      stat: { value: "4", label: "Dose buckets sorted automatically" },
+    },
+    underTheHood: {
+      title: "Built around real prescription schedules",
+      bullets: [
+        "Dose-bucket sorting is driven by each prescription's actual frequency, not a generic reminder time.",
+        "Delivery tracking follows the same placed → packed → out for delivery → delivered pattern as consumer logistics apps.",
+        "Prescription data is stored on-device and tied to your Apple ID sign-in.",
+      ],
+    },
+    integration: {
+      title: "Feeds into IQLife",
+      body: "A missed dose or a delayed delivery becomes context IQLife factors into today's plan, right alongside sleep, driving, and spending signals.",
+      links: ["iqlife"],
+    },
+    specs: [
+      { label: "Platform", value: "iOS" },
+      { label: "Data storage", value: "On-device, tied to Apple ID" },
+      { label: "Scheduling", value: "Morning, Afternoon, Evening, Night buckets" },
+      { label: "Delivery tracking", value: "Placed → Packed → Out for delivery → Delivered" },
+    ],
+    faq: [
+      {
+        q: "Does IQrX replace my pharmacy?",
+        a: "No — it organizes what you're prescribed and can request delivery for refills, working alongside your existing pharmacy.",
+      },
+      {
+        q: "Is my prescription data shared with anyone?",
+        a: "No. Your prescription data is used only to build your schedule and manage your own deliveries.",
+      },
+      {
+        q: "Can I track prescriptions for more than one person?",
+        a: "IQrX is currently built around a single person's prescriptions and schedule.",
       },
     ],
   },

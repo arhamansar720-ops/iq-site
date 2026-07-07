@@ -8,6 +8,8 @@ const NODES = [
   { id: "commute", label: "IQCommute", x: 10, y: 72 },
   { id: "receipts", label: "IQReceipts", x: 10, y: 96 },
   { id: "finance", label: "IQFinance", x: 50, y: 96 },
+  { id: "valet", label: "IQValet", x: 50, y: 30 },
+  { id: "rx", label: "IQrX", x: 50, y: 62 },
   { id: "life", label: "IQLife", x: 88, y: 50 },
 ];
 
@@ -17,6 +19,9 @@ const LINKS: [string, string][] = [
   ["commute", "life"],
   ["receipts", "finance"],
   ["finance", "life"],
+  ["valet", "drive"],
+  ["valet", "commute"],
+  ["rx", "life"],
 ];
 
 function pos(id: string) {
