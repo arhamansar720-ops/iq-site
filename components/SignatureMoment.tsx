@@ -37,7 +37,7 @@ export default function SignatureMoment({
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.1 }}>
-          <ProductMockup variant={variant} />
+          <ProductMockup variant={variant} context="signature" />
         </motion.div>
       </div>
     </section>

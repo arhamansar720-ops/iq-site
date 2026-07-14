@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import ProductMockup from "./ProductMockup";
+import RetailerMarquee from "./RetailerMarquee";
 import FeatureAccordion from "./FeatureAccordion";
 import ProblemSection from "./ProblemSection";
 import HowItWorks from "./HowItWorks";
@@ -27,7 +28,7 @@ export default function ProductPageContent({
       {/* HERO */}
       <section className="relative min-h-[90svh] flex items-center overflow-hidden bg-radial-glow pt-24">
         <div className="absolute inset-0 noise opacity-30 pointer-events-none" />
-        <div className="relative z-10 mx-auto max-w-7xl px-6 md:px-10 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+        <div className="relative z-10 w-full mx-auto max-w-7xl px-6 md:px-10 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <Link href="/#products" className="inline-flex items-center gap-2 text-xs text-mute hover:text-ivory transition-colors mb-8">
               <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
@@ -69,6 +70,9 @@ export default function ProductPageContent({
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent pointer-events-none" />
       </section>
+
+      {/* RETAILER MARQUEE — IQSavings only */}
+      {product.slug === "iqsavings" && <RetailerMarquee />}
 
       {/* THE PROBLEM */}
       <ProblemSection headline={product.problem.headline} body={product.problem.body} />

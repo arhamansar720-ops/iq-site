@@ -1,18 +1,24 @@
-import PhoneMockup from "./PhoneMockup";
+import BrowserMockup from "./BrowserMockup";
+import IllustratedPhoneMockup from "./IllustratedPhoneMockup";
 import type { ProductVariant } from "@/lib/products";
 
-const SCREENSHOTS: Record<ProductVariant, { src: string; alt: string }> = {
-  habits: { src: "/screenshots/iqhabits.png", alt: "IQHabits app screenshot" },
-  drive: { src: "/screenshots/iqdrive.png", alt: "IQDrive app screenshot" },
-  commute: { src: "/screenshots/iqcommute.png", alt: "IQCommute app screenshot" },
-  receipts: { src: "/screenshots/iqreceipts.png", alt: "IQReceipts app screenshot" },
-  life: { src: "/screenshots/iqlife.png", alt: "IQLife app screenshot" },
-  finance: { src: "/screenshots/iqfinance.png", alt: "IQFinance app screenshot" },
-  valet: { src: "/screenshots/iqvalet.png", alt: "IQValet app screenshot" },
-  rx: { src: "/screenshots/iqrx.png", alt: "IQrX app screenshot" },
-};
+export default function ProductMockup({
+  variant,
+  context = "hero",
+}: {
+  variant: ProductVariant;
+  context?: "hero" | "signature";
+}) {
+  // IQSavings is a browser extension, not an iPhone app — it gets its own
+  // browser-window mockup. The hero shows the coupon-testing moment; the
+  // signature section shows the price-protection moment, so the imagery
+  // tells a different beat of the story each time.
+  if (variant === "savings") {
+    return <BrowserMockup mode={context === "signature" ? "priceProtection" : "coupon"} />;
+  }
 
-export default function ProductMockup({ variant }: { variant: ProductVariant }) {
-  const shot = SCREENSHOTS[variant];
-  return <PhoneMockup src={shot.src} alt={shot.alt} />;
+  // Every other product gets an illustrated phone screen built from the
+  // product's own real stats/copy — no screenshot asset dependency, and it
+  // reads as designed marketing art rather than a raw app capture.
+  return <IllustratedPhoneMockup variant={variant} />;
 }

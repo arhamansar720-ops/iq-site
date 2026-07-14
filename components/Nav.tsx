@@ -92,7 +92,13 @@ export default function Nav() {
           ))}
         </ul>
 
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center gap-5">
+          <Link
+            href="/signin"
+            className="text-sm text-mute hover:text-ivory transition-colors duration-300"
+          >
+            Sign In
+          </Link>
           <Link
             href="/#pricing"
             className="inline-flex items-center rounded-full bg-ivory text-void text-sm font-medium px-5 py-2.5 hover:bg-signal transition-colors duration-300"
@@ -158,6 +164,15 @@ export default function Nav() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                href="/signin"
+                onClick={() => setOpen(false)}
+                className="block text-base text-mute hover:text-ivory transition-colors py-2"
+              >
+                Sign In
+              </Link>
+            </li>
             <li className="pt-2">
               <Link
                 href="/#pricing"

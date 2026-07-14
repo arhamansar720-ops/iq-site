@@ -1,4 +1,4 @@
-export type ProductVariant = "habits" | "drive" | "commute" | "receipts" | "life" | "finance" | "valet" | "rx";
+export type ProductVariant = "habits" | "drive" | "commute" | "receipts" | "life" | "finance" | "valet" | "rx" | "savings";
 
 export type Product = {
   slug: string;
@@ -507,13 +507,14 @@ export const PRODUCTS: Product[] = [
     index: 6,
     name: "IQFinance",
     category: "Financial Intelligence",
-    status: "soon",
-    tagline: "Launching soon.",
+    status: "live",
+    tagline: "One number, no shame, structure first.",
     description:
-      "Financial Intelligence — the next platform in the ecosystem, connecting every decision you make about money to the rest of your IQ.",
+      "Financial Intelligence that connects every decision you make about money to the rest of your IQ — with real bank accounts, not manual entry.",
     longDescription:
-      "IQFinance is being built around a simpler idea than most money apps: one number, no shame, structure first. It picks up directly where IQReceipts leaves off.",
+      "IQFinance is built around a simpler idea than most money apps: one number, no shame, structure first. It picks up directly where IQReceipts leaves off, and connects your real accounts through Plaid instead of asking you to enter anything by hand.",
     features: [
+      "Real bank account connection",
       "Net worth tracking",
       "Spending-to-savings bridge",
       "Goal-based planning",
@@ -521,6 +522,7 @@ export const PRODUCTS: Product[] = [
       "Connected to IQLife",
     ],
     featureDetails: [
+      "Securely connects real bank and card accounts through Plaid, with balances filled in automatically the moment you link — no manual entry.",
       "A live view of assets versus liabilities, updated automatically as connected accounts and products change.",
       "Turns spending patterns already detected by IQReceipts into concrete savings moves, instead of leaving insight and action disconnected.",
       "Set a goal — an amount, a date — and IQFinance works backward into a plan that adjusts as your spending changes.",
@@ -528,73 +530,77 @@ export const PRODUCTS: Product[] = [
       "Feeds your financial IQ into the same daily plan IQLife builds, alongside health, driving, and commute.",
     ],
     stats: [
-      { label: "Status", value: "Soon" },
-      { label: "Waitlist", value: "Open" },
+      { label: "Finance IQ", value: "79" },
+      { label: "Bank connection", value: "Plaid" },
       { label: "Connects to", value: "2 products" },
     ],
     variant: "finance",
     problem: {
       headline: "Money apps love to make you feel behind.",
-      body: "Red and green progress bars, guilt-based budgets, categories that don't match how you actually think about spending. IQFinance is being built around a simpler idea: one number, no shame, structure first.",
+      body: "Red and green progress bars, guilt-based budgets, categories that don't match how you actually think about spending. IQFinance is built around a simpler idea: one number, no shame, structure first.",
     },
     howItWorks: {
-      title: "The plan so far",
+      title: "How IQFinance actually works",
       steps: [
         {
           title: "Starts where IQReceipts leaves off",
           body: "Categorized spending and subscriptions already detected by IQReceipts become the foundation — nothing re-entered.",
         },
         {
+          title: "Real accounts, not manual entry",
+          body: "Connect real bank and card accounts through Plaid; balances populate automatically the moment an account links.",
+        },
+        {
           title: "One number, not ten categories",
-          body: "A single Financial IQ score is designed to replace a wall of budget categories most people don't check anyway.",
+          body: "A single Financial IQ score replaces a wall of budget categories most people don't check anyway.",
         },
         {
           title: "Goals, worked backward",
-          body: "Set an amount and a date — IQFinance is being designed to work backward into a plan that adjusts as spending changes.",
+          body: "Set an amount and a date — IQFinance works backward into a plan that adjusts as your spending changes.",
         },
         {
           title: "Shows up in your day, not a separate app",
-          body: "Like every IQ product, financial decisions are meant to surface inside IQLife's daily plan instead of living in their own dashboard.",
+          body: "Like every IQ product, financial decisions surface inside IQLife's daily plan instead of living in their own dashboard.",
         },
       ],
     },
     signature: {
-      eyebrow: "Coming soon",
+      eyebrow: "The flagship feature",
       title: "Built shame-free, on purpose.",
-      body: "IQFinance is still early, but the core decision is already made: no red-and-green guilt bars, no comparison to anyone else's spending — just the one thing worth knowing today.",
-      stat: { value: "Soon", label: "In active development" },
+      body: "No red-and-green guilt bars, no comparison to anyone else's spending — just the one thing worth knowing today, backed by real account data instead of numbers you typed in yourself.",
+      stat: { value: "1", label: "Number that actually matters" },
     },
     underTheHood: {
-      title: "What's already decided",
+      title: "What's actually built",
       bullets: [
-        "Will inherit categorized data directly from IQReceipts rather than starting from a blank slate.",
-        "Designed to connect to IQLife's daily plan from day one, not bolted on later.",
-        "No public release date yet — built deliberately rather than rushed.",
+        "Real bank/card linking through Plaid — account balances refresh automatically, no manual entry.",
+        "Inherits categorized data directly from IQReceipts rather than starting from a blank slate.",
+        "Connects to IQLife's daily plan from day one, not bolted on later.",
       ],
     },
     integration: {
       title: "Connects to IQReceipts and IQLife",
-      body: "IQFinance is being designed as a continuation of IQReceipts' spending data, and as a direct input into IQLife's daily plan.",
+      body: "IQFinance is a direct continuation of IQReceipts' spending data, and a direct input into IQLife's daily plan.",
       links: ["iqreceipts", "iqlife"],
     },
     specs: [
-      { label: "Status", value: "In development" },
-      { label: "Foundation", value: "IQReceipts spending data" },
-      { label: "Planned integration", value: "IQLife daily plan" },
       { label: "Platform", value: "iOS" },
+      { label: "Bank connection", value: "Plaid" },
+      { label: "Foundation", value: "IQReceipts spending data" },
+      { label: "Integration", value: "IQLife daily plan" },
     ],
     faq: [
       {
-        q: "When does IQFinance launch?",
-        a: "There's no public date yet — it's being built deliberately rather than rushed out.",
+        q: "Is my bank information safe?",
+        a: "Bank connections go through Plaid, the same infrastructure used by most major finance apps — IQFinance never sees or stores your bank credentials directly.",
       },
       {
         q: "Will I need IQReceipts to use it?",
-        a: "IQFinance is being designed to build directly on IQReceipts' data, so using both together will likely unlock the most value.",
+        a: "No, but IQFinance is designed to build directly on IQReceipts' data, so using both together unlocks the most value.",
       },
       {
-        q: "Can I get early access?",
-        a: "Joining the waitlist on this page is the best way to hear first when early access opens.",
+        q: "Do I have to enter my balances manually?",
+        a: "No — once you connect an account through Plaid, its balance populates automatically and stays current.",
       },
     ],
   },
@@ -787,6 +793,102 @@ export const PRODUCTS: Product[] = [
       {
         q: "Can I track prescriptions for more than one person?",
         a: "IQrX is currently built around a single person's prescriptions and schedule.",
+      },
+    ],
+  },
+  {
+    slug: "iqsavings",
+    index: 9,
+    name: "IQSavings",
+    category: "Savings Intelligence",
+    status: "soon",
+    tagline: "Launching soon.",
+    description:
+      "Finds and tests every working coupon code automatically, compares prices across retailers, and keeps watching after you buy.",
+    longDescription:
+      "IQSavings tests every coupon code at checkout automatically, compares the same product across other retailers before you buy, and keeps watching the price afterward — so if it drops, it drafts the claim instead of just telling you it happened.",
+    features: [
+      "Automatic coupon testing",
+      "Cross-retailer price comparison",
+      "Price history & drop alerts",
+      "Price protection claims",
+      "Best card & rewards suggestion",
+    ],
+    featureDetails: [
+      "Every code in IQSavings' community-verified vault gets tested at checkout automatically — the one that works applies itself, the rest never waste your time.",
+      "Before you buy, IQSavings checks the same product across other retailers and flags it if it's cheaper elsewhere — not just wherever pays the highest referral fee.",
+      "Every product page you visit gets a price history chart, so you know whether now is actually a good time to buy or a drop is likely coming.",
+      "Watches the price for 30 days after you buy — if it drops within the retailer's price-protection window, IQSavings drafts the adjustment or refund claim for you to review and send.",
+      "At checkout, compares your saved cards and rewards programs and tells you which one actually earns the most back on that specific purchase.",
+    ],
+    stats: [
+      { label: "Status", value: "Soon" },
+      { label: "Waitlist", value: "Open" },
+      { label: "Connects to", value: "2 products" },
+    ],
+    variant: "savings",
+    problem: {
+      headline: "Honey finds a coupon. Then it stops caring.",
+      body: "Most savings extensions test a few codes, quietly route your purchase through an affiliate link, and move on. They don't check if the price drops the week after, and they definitely don't tell you when a different retailer would've been cheaper the whole time. IQSavings treats the moment you click “buy” as the start of the job, not the end of it.",
+    },
+    howItWorks: {
+      title: "How IQSavings actually works",
+      steps: [
+        {
+          title: "Every checkout, tested automatically",
+          body: "IQSavings scans a constantly-updated, community-verified code vault and tests every candidate at checkout — the best one applies itself.",
+        },
+        {
+          title: "Checked against other retailers first",
+          body: "Before you commit, IQSavings compares the same product across other stores, so “convenient” and “cheapest” aren't quietly assumed to be the same thing.",
+        },
+        {
+          title: "Watched for 30 days after",
+          body: "Your purchase doesn't disappear the moment you pay — IQSavings keeps tracking the price in case it drops.",
+        },
+        {
+          title: "A claim, not just a notification",
+          body: "If the price does drop, IQSavings drafts the price-adjustment or refund request for you to review and send.",
+        },
+      ],
+    },
+    signature: {
+      eyebrow: "The signature feature",
+      title: "It doesn't just catch the price drop. It drafts the refund.",
+      body: "Honey and Capital One Shopping might tell you a price dropped after you bought something — and stop there. IQSavings goes one step further: when it catches a post-purchase price drop inside the retailer's price-protection window, it drafts the adjustment or refund request for you, ready to review and send. The same instinct behind IQReceipts' subscription-cancellation drafts, aimed at every purchase you make.",
+      stat: { value: "30d", label: "Price watched after every purchase" },
+    },
+    underTheHood: {
+      title: "Built to be honest about what actually saves you money",
+      bullets: [
+        "Coupon codes are tested live at checkout, not against a stale cached list — dead codes get pruned from the vault automatically.",
+        "Cross-retailer price comparison ranks by actual price, not by which retailer pays the highest referral commission.",
+        "Price-protection claims are always shown for review before sending — nothing goes out without your approval.",
+      ],
+    },
+    integration: {
+      title: "Feeds straight into IQFinance",
+      body: "Every dollar IQSavings finds — a working code, a lower price elsewhere, a successful price-adjustment claim — counts toward your Financial IQ the same way a categorized IQReceipts purchase does.",
+      links: ["iqreceipts", "iqfinance"],
+    },
+    specs: [
+      { label: "Platform", value: "Chrome, Safari" },
+      { label: "Coupon vault", value: "Community-verified, auto-tested" },
+      { label: "Price tracking window", value: "30 days post-purchase" },
+      { label: "Status", value: "In development" },
+    ],
+    faq: [
+      {
+        q: "Does IQSavings take a cut of my purchase like Honey does?",
+        a: "No. IQSavings isn't funded by affiliate commissions that push you toward specific retailers — its incentive is finding the actual best price, not the best-paying one.",
+      },
+      {
+        q: "Will it submit price-protection claims without asking me?",
+        a: "No. Every claim is drafted for your review — nothing is sent on your behalf without approval.",
+      },
+      {
+        q: "Do I need IQReceipts or IQFinance to use it?",
+        a: "IQSavings works on its own, but savings it finds automatically feed into IQFinance's Financial IQ when you have it connected.",
       },
     ],
   },

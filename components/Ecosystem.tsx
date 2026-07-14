@@ -3,14 +3,15 @@
 import { motion } from "framer-motion";
 
 const NODES = [
-  { id: "habits", label: "IQHabits", x: 10, y: 12 },
-  { id: "drive", label: "IQDrive", x: 10, y: 42 },
-  { id: "commute", label: "IQCommute", x: 10, y: 72 },
-  { id: "receipts", label: "IQReceipts", x: 10, y: 96 },
+  { id: "habits", label: "IQHabits", x: 14, y: 12 },
+  { id: "drive", label: "IQDrive", x: 14, y: 42 },
+  { id: "commute", label: "IQCommute", x: 14, y: 72 },
+  { id: "receipts", label: "IQReceipts", x: 14, y: 96 },
+  { id: "savings", label: "IQSavings", x: 32, y: 78 },
   { id: "finance", label: "IQFinance", x: 50, y: 96 },
   { id: "valet", label: "IQValet", x: 50, y: 30 },
   { id: "rx", label: "IQrX", x: 50, y: 62 },
-  { id: "life", label: "IQLife", x: 88, y: 50 },
+  { id: "life", label: "IQLife", x: 80, y: 50 },
 ];
 
 const LINKS: [string, string][] = [
@@ -18,6 +19,8 @@ const LINKS: [string, string][] = [
   ["drive", "life"],
   ["commute", "life"],
   ["receipts", "finance"],
+  ["receipts", "savings"],
+  ["savings", "finance"],
   ["finance", "life"],
   ["valet", "drive"],
   ["valet", "commute"],
@@ -83,7 +86,7 @@ export default function Ecosystem() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full glass px-3.5 py-2 text-[11px] md:text-xs text-ivory whitespace-nowrap"
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full glass px-2.5 py-1.5 md:px-3.5 md:py-2 text-[10px] md:text-xs text-ivory whitespace-nowrap"
               style={{ left: `${n.x}%`, top: `${n.y}%` }}
             >
               <span className={`inline-block h-1.5 w-1.5 rounded-full mr-2 ${n.id === "life" ? "bg-signal" : "bg-mute"}`} />

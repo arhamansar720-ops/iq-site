@@ -2,9 +2,9 @@ import Link from "next/link";
 
 const LINKS = [
   { label: "Products", href: "/#products" },
-  { label: "Privacy", href: "/#privacy" },
-  { label: "Terms", href: "/#terms" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Contact", href: "mailto:support@iq.com" },
 ];
 
 export default function Footer() {

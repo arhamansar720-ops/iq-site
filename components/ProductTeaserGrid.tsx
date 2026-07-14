@@ -20,7 +20,7 @@ export default function ProductTeaserGrid() {
             The IQ family
           </div>
           <h2 className="font-display text-3xl md:text-5xl tracking-tight text-ivory">
-            One ecosystem. Eight intelligences.
+            One ecosystem. Nine intelligences.
           </h2>
         </motion.div>
 

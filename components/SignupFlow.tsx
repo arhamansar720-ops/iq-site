@@ -5,8 +5,9 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { PLANS, getPlan, type Plan } from "@/lib/plans";
 import { PRODUCTS } from "@/lib/products";
+import * as accountApi from "@/lib/account";
 
-type Step = "plan" | "products" | "account" | "done";
+type Step = "plan" | "products" | "account" | "done" | "check-email";
 
 export default function SignupFlow({ initialPlanId }: { initialPlanId?: string }) {
   const initialPlan = getPlan(initialPlanId);
@@ -15,6 +16,7 @@ export default function SignupFlow({ initialPlanId }: { initialPlanId?: string }
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const liveProducts = useMemo(() => PRODUCTS.filter((p) => p.status === "live"), []);
   const allIncluded = plan?.maxProducts === "all";
@@ -45,13 +47,23 @@ export default function SignupFlow({ initialPlanId }: { initialPlanId?: string }
     setStep("account");
   }
 
-  function createAccount() {
+  async function createAccount() {
     if (!form.name.trim() || !form.email.trim() || form.password.length < 8) {
       setError("Enter your name, a valid email, and a password of at least 8 characters.");
       return;
     }
+    if (!plan) return;
     setError(null);
-    setStep("done");
+    setLoading(true);
+    try {
+      const productSlugs = allIncluded ? PRODUCTS.map((p) => p.slug) : selected;
+      const result = await accountApi.signUp(form.email, form.password, form.name, plan.id, productSlugs);
+      setStep(result.status === "check-email" ? "check-email" : "done");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong creating your account.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const chosenProducts = allIncluded ? PRODUCTS : PRODUCTS.filter((p) => selected.includes(p.slug));
@@ -61,14 +73,16 @@ export default function SignupFlow({ initialPlanId }: { initialPlanId?: string }
       <div className="mx-auto max-w-2xl px-6 md:px-10">
         {/* progress */}
         <div className="flex items-center gap-2 mb-10">
-          {(["plan", "products", "account", "done"] as Step[]).map((s, i) => (
-            <div
-              key={s}
-              className={`h-1 flex-1 rounded-full ${
-                ["plan", "products", "account", "done"].indexOf(step) >= i ? "bg-signal" : "bg-white/10"
-              }`}
-            />
-          ))}
+          {(["plan", "products", "account", "done"] as Step[]).map((s, i) => {
+            const order = ["plan", "products", "account", "done"];
+            const currentIndex = order.indexOf(step === "check-email" ? "done" : step);
+            return (
+              <div
+                key={s}
+                className={`h-1 flex-1 rounded-full ${currentIndex >= i ? "bg-signal" : "bg-white/10"}`}
+              />
+            );
+          })}
         </div>
 
         <AnimatePresence mode="wait">
@@ -215,15 +229,38 @@ export default function SignupFlow({ initialPlanId }: { initialPlanId?: string }
                 </button>
                 <button
                   onClick={createAccount}
-                  className="flex-1 inline-flex items-center justify-center rounded-full bg-ivory text-void text-sm font-medium px-6 py-3.5 hover:bg-signal transition-colors duration-300"
+                  disabled={loading}
+                  className="flex-1 inline-flex items-center justify-center rounded-full bg-ivory text-void text-sm font-medium px-6 py-3.5 hover:bg-signal transition-colors duration-300 disabled:opacity-60"
                 >
-                  Create account
+                  {loading ? "Creating…" : "Create account"}
                 </button>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 4 — done */}
+          {/* STEP 4a — check email (only if email confirmation is required) */}
+          {step === "check-email" && (
+            <motion.div key="check-email" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+              <div className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 mb-7 text-xs text-mute">
+                <span className="h-1.5 w-1.5 rounded-full bg-signal animate-pulseDot" />
+                Almost there
+              </div>
+              <h1 className="font-display text-3xl md:text-4xl tracking-tight text-ivory mb-3">Check your email</h1>
+              <p className="text-mute mb-10">
+                We sent a confirmation link to <span className="text-ivory">{form.email}</span>. Click it, then come
+                back and sign in — your plan and products are already saved and will finish setting up
+                automatically.
+              </p>
+              <Link
+                href="/signin"
+                className="inline-flex items-center justify-center rounded-full bg-ivory text-void text-sm font-medium px-7 py-3.5 hover:bg-signal transition-colors duration-300"
+              >
+                Go to sign in
+              </Link>
+            </motion.div>
+          )}
+
+          {/* STEP 4b — done */}
           {step === "done" && plan && (
             <motion.div key="done" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <div className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 mb-7 text-xs text-mute">

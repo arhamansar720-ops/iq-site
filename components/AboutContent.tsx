@@ -24,7 +24,7 @@ export default function AboutContent() {
     <main>
       <section className="relative min-h-[70svh] flex items-center overflow-hidden bg-radial-glow pt-24">
         <div className="absolute inset-0 noise opacity-30 pointer-events-none" />
-        <div className="relative z-10 mx-auto max-w-4xl px-6 md:px-10 text-center">
+        <div className="relative z-10 w-full mx-auto max-w-4xl px-6 md:px-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
