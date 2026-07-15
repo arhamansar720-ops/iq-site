@@ -58,7 +58,25 @@ export default function SignupFlow({ initialPlanId }: { initialPlanId?: string }
     try {
       const productSlugs = allIncluded ? PRODUCTS.map((p) => p.slug) : selected;
       const result = await accountApi.signUp(form.email, form.password, form.name, plan.id, productSlugs);
-      setStep(result.status === "check-email" ? "check-email" : "done");
+
+      if (result.status === "check-email") {
+        // Paid checkout can't start yet — there's no session until they
+        // confirm their email. SigninFlow finishes this the first time
+        // they sign in (see the pending-signup branch there).
+        setStep("check-email");
+        return;
+      }
+
+      if (plan.id === "free") {
+        setStep("done");
+        return;
+      }
+
+      // Paid plan: the account now exists on the free plan (complete_signup
+      // never grants paid access itself) — send them to Stripe to actually
+      // pay before showing anything as "done".
+      const { url } = await accountApi.startCheckout(plan.id as "plus" | "one", productSlugs);
+      window.location.href = url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong creating your account.");
     } finally {

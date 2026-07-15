@@ -54,9 +54,18 @@ export default function SigninFlow() {
   }
 
   async function changePlan(planId: string) {
+    if (!account) return;
     setError(null);
     setLoading(true);
     try {
+      if (planId === "plus" || planId === "one") {
+        // Upgrading (or switching between paid plans) always goes through
+        // Stripe — carry over whatever products are already connected so
+        // checkout can grant them again once payment clears.
+        const { url } = await accountApi.startCheckout(planId, account.products);
+        window.location.href = url;
+        return;
+      }
       const acc = await accountApi.changePlan(planId);
       setAccount(acc);
       setView("overview");
@@ -76,6 +85,12 @@ export default function SigninFlow() {
 
   function toggleDraftProduct(slug: string) {
     if (!account) return;
+    if (account.plan.id === "free") {
+      // One product at a time on the free tier — picking a new one just
+      // replaces the current selection rather than toggling a checkbox.
+      setDraftSelected((prev) => (prev[0] === slug ? [] : [slug]));
+      return;
+    }
     const max = account.plan.maxProducts === "all" ? PRODUCTS.length : account.plan.maxProducts;
     setDraftSelected((prev) => {
       if (prev.includes(slug)) return prev.filter((s) => s !== slug);
@@ -85,9 +100,23 @@ export default function SigninFlow() {
   }
 
   async function saveProducts() {
+    if (!account) return;
     setError(null);
     setLoading(true);
     try {
+      if (account.plan.id === "free") {
+        // Free tier: exactly one product, swapped through switch_free_product
+        // so the 6-month cooldown is actually enforced server-side.
+        const newSlug = draftSelected[0];
+        if (!newSlug) {
+          setError("Choose a product to connect.");
+          return;
+        }
+        const acc = await accountApi.switchFreeProduct(newSlug);
+        setAccount(acc);
+        setView("overview");
+        return;
+      }
       const acc = await accountApi.setProducts(draftSelected);
       setAccount(acc);
       setView("overview");
@@ -274,8 +303,11 @@ export default function SigninFlow() {
             <motion.div key="products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }}>
               <h1 className="font-display text-3xl md:text-4xl tracking-tight text-ivory mb-3">Manage products</h1>
               <p className="text-mute mb-8">
-                {account.plan.name} includes {account.plan.maxProducts}{" "}
-                {account.plan.maxProducts === 1 ? "product" : "products"}.
+                {account.plan.id === "free"
+                  ? "Free includes 1 product. You can switch which one at most once every 6 months."
+                  : `${account.plan.name} includes ${account.plan.maxProducts} ${
+                      account.plan.maxProducts === 1 ? "product" : "products"
+                    }.`}
               </p>
               {error && <p className="text-sm text-signal mb-4">{error}</p>}
 

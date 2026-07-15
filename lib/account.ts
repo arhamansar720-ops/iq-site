@@ -90,9 +90,12 @@ export async function signUp(
     return { status: "check-email", email };
   }
 
+  // complete_signup always lands the account on the free plan now — a paid
+  // planId here just tells the caller (SignupFlow) to immediately kick off
+  // Stripe Checkout right after this resolves. See apply_stripe_subscription
+  // in schema.sql for why plan_id can no longer be set from the client.
   const { error: rpcError } = await supabase.rpc("complete_signup", {
-    p_plan_id: planId,
-    p_product_slugs: productSlugs,
+    p_product_slugs: planId === "free" ? productSlugs : [],
   });
   if (rpcError) throw new Error(friendlyError(rpcError.message));
 
@@ -108,12 +111,25 @@ export async function signIn(email: string, password: string): Promise<Account> 
   const pending = readPendingSignup(email);
   if (pending) {
     const { error: rpcError } = await supabase.rpc("complete_signup", {
-      p_plan_id: pending.planId,
-      p_product_slugs: pending.productSlugs,
+      p_product_slugs: pending.planId === "free" ? pending.productSlugs : [],
     });
-    if (!rpcError) clearPendingSignup();
-    // If this errors (e.g. already completed by an earlier sign-in), fall
-    // through — the account load below still tells us the real state.
+    if (!rpcError) {
+      clearPendingSignup();
+      if (pending.planId === "plus" || pending.planId === "one") {
+        // They picked a paid plan before confirming their email — now that
+        // they're actually signed in, send them to Stripe to finish paying.
+        try {
+          const { url } = await startCheckout(pending.planId, pending.productSlugs);
+          window.location.href = url;
+          return new Promise<Account>(() => {}); // navigating away
+        } catch {
+          // Checkout couldn't start (e.g. Stripe not configured yet) — they
+          // land on their free-plan account and can retry from "Change plan".
+        }
+      }
+    }
+    // If rpcError is set (e.g. already completed by an earlier sign-in),
+    // fall through — the account load below still tells us the real state.
   }
 
   const account = await loadAccount();
@@ -125,12 +141,49 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
 }
 
+// Downgrade/cancel only — the server rejects anything but 'free' here.
+// Upgrading to a paid plan goes through startCheckout() instead, since it
+// has to actually be paid for.
 export async function changePlan(planId: string): Promise<Account> {
   const { error } = await supabase.rpc("change_plan", { p_plan_id: planId });
   if (error) throw new Error(friendlyError(error.message));
 
   const account = await loadAccount();
   if (!account) throw new Error("Couldn't reload your account after changing plans.");
+  return account;
+}
+
+// Redirects to Stripe Checkout for a paid plan. Call this right after
+// complete_signup() for a new paid signup, or any time an existing
+// free-plan user wants to upgrade.
+export async function startCheckout(
+  planId: "plus" | "one",
+  productSlugs: string[]
+): Promise<{ url: string }> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not signed in.");
+
+  const res = await fetch("/api/stripe/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+    body: JSON.stringify({ planId, productSlugs }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Couldn't start checkout.");
+  return data;
+}
+
+// Free-plan-only: swap the single connected product for a different one,
+// at most once every 6 months (enforced server-side in switch_free_product,
+// not just in this UI — see schema.sql for why).
+export async function switchFreeProduct(newSlug: string): Promise<Account> {
+  const { error } = await supabase.rpc("switch_free_product", { p_new_slug: newSlug });
+  if (error) throw new Error(friendlyError(error.message));
+
+  const account = await loadAccount();
+  if (!account) throw new Error("Couldn't reload your account after switching products.");
   return account;
 }
 

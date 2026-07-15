@@ -31,6 +31,13 @@ create table public.subscriptions (
       when 'one'  then 999   -- sentinel for "all"; clients map 999 <-> "all"
     end
   ) stored,
+  -- set only by the Stripe webhook (service role) — never by the client,
+  -- since plan_id is what actually unlocks paid features.
+  stripe_customer_id text unique,
+  stripe_subscription_id text unique,
+  -- free-tier "switch your one app" cooldown; null = never switched, so
+  -- always allowed the first time.
+  last_free_switch_at timestamptz,
   updated_at timestamptz not null default now()
 );
 
@@ -60,10 +67,30 @@ alter table public.entitlements enable row level security;
 
 create policy "entitlements_select_own" on public.entitlements
   for select using (auth.uid() = user_id);
+
+-- Direct inserts/deletes are only allowed for paid plans. Free-plan users
+-- have exactly one product and can only change it through the
+-- switch_free_product() RPC, which enforces the 6-month cooldown — without
+-- this plan_id check, a free user could bypass that cooldown entirely by
+-- calling supabase.from('entitlements').insert/delete() directly from the
+-- browser console, same class of bug as the plan_id-spoofing issue fixed
+-- in complete_signup/change_plan below.
 create policy "entitlements_insert_own" on public.entitlements
-  for insert with check (auth.uid() = user_id);
+  for insert with check (
+    auth.uid() = user_id
+    and exists (
+      select 1 from public.subscriptions s
+      where s.user_id = auth.uid() and s.plan_id <> 'free'
+    )
+  );
 create policy "entitlements_delete_own" on public.entitlements
-  for delete using (auth.uid() = user_id);
+  for delete using (
+    auth.uid() = user_id
+    and exists (
+      select 1 from public.subscriptions s
+      where s.user_id = auth.uid() and s.plan_id <> 'free'
+    )
+  );
 
 -- 4. CAP ENFORCEMENT — DB trigger is the source of truth, not app code.
 -- Every client (website + 8 apps) hits this automatically through the
@@ -121,11 +148,15 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- 6. complete_signup — atomic RPC used by the website's signup flow.
--- Sets the chosen plan and inserts the chosen product entitlements in one
--- statement, so a dropped connection mid-signup can't leave a half-set-up
--- account (e.g. plan set to "plus" but zero products connected).
+-- Every account starts on the free plan, full stop — plan_id is NOT a
+-- client-supplied argument. Paid plans are only ever set by
+-- apply_stripe_subscription() below, called from the Stripe webhook after
+-- a real payment clears. (The old version took p_plan_id straight from the
+-- client, which meant anyone could call complete_signup('one', [...]) from
+-- the browser console and get every product for free — that hole is why
+-- this function's signature changed.)
+drop function if exists public.complete_signup(text, text[]);
 create or replace function public.complete_signup(
-  p_plan_id text,
   p_product_slugs text[]
 )
 returns void
@@ -137,7 +168,7 @@ declare
   slug text;
 begin
   update public.subscriptions
-  set plan_id = p_plan_id, updated_at = now()
+  set plan_id = 'free', updated_at = now()
   where user_id = auth.uid();
 
   foreach slug in array p_product_slugs loop
@@ -148,9 +179,10 @@ begin
 end;
 $$;
 
--- 7. change_plan — atomic RPC used when a signed-in user switches plans.
--- Truncates existing entitlements down to the new cap (oldest-connected
--- first) so downgrading never leaves the account over its new limit.
+-- 7. change_plan — client-callable RPC, but now downgrade-only (to free).
+-- Upgrading to a paid plan has to go through Stripe Checkout so it's
+-- actually paid for; this RPC remains for cancellation, which needs no
+-- payment. Truncates entitlements down to the free cap (oldest first).
 create or replace function public.change_plan(p_plan_id text)
 returns void
 language plpgsql
@@ -160,8 +192,12 @@ as $$
 declare
   new_cap int;
 begin
+  if p_plan_id <> 'free' then
+    raise exception 'Upgrading plans requires checkout — call the /api/stripe/checkout route, not change_plan() directly.';
+  end if;
+
   update public.subscriptions
-  set plan_id = p_plan_id, updated_at = now()
+  set plan_id = 'free', updated_at = now()
   where user_id = auth.uid();
 
   select max_products into new_cap from public.subscriptions where user_id = auth.uid();
@@ -173,6 +209,118 @@ begin
     order by connected_at desc
     offset new_cap
   );
+end;
+$$;
+
+-- 7a. apply_stripe_subscription — sets a paid plan after a real Stripe
+-- payment clears. Only the Stripe webhook (using the service_role key,
+-- which bypasses RLS and function-execute grants entirely) should ever
+-- call this — it's explicitly revoked from anon/authenticated below so the
+-- browser client can never call it directly.
+create or replace function public.apply_stripe_subscription(
+  p_user_id uuid,
+  p_plan_id text,
+  p_stripe_customer_id text,
+  p_stripe_subscription_id text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_plan_id not in ('plus', 'one') then
+    raise exception 'apply_stripe_subscription is only for paid plans; use change_plan for free.';
+  end if;
+
+  update public.subscriptions
+  set plan_id = p_plan_id,
+      stripe_customer_id = p_stripe_customer_id,
+      stripe_subscription_id = p_stripe_subscription_id,
+      updated_at = now()
+  where user_id = p_user_id;
+end;
+$$;
+
+revoke execute on function public.apply_stripe_subscription(uuid, text, text, text) from public, anon, authenticated;
+grant execute on function public.apply_stripe_subscription(uuid, text, text, text) to service_role;
+
+-- 7b. cancel_stripe_subscription — mirror of apply_stripe_subscription for
+-- the webhook's `customer.subscription.deleted` event (payment lapsed,
+-- cancelled, etc). Drops the account back to free and prunes entitlements
+-- to the free cap, same as change_plan, but keyed by Stripe customer ID
+-- since there's no authenticated request driving this — it's a server
+-- push, not a user action.
+create or replace function public.cancel_stripe_subscription(p_stripe_customer_id text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  target_user uuid;
+begin
+  select user_id into target_user
+  from public.subscriptions
+  where stripe_customer_id = p_stripe_customer_id;
+
+  if target_user is null then
+    return;
+  end if;
+
+  update public.subscriptions
+  set plan_id = 'free', updated_at = now()
+  where user_id = target_user;
+
+  delete from public.entitlements
+  where id in (
+    select id from public.entitlements
+    where user_id = target_user
+    order by connected_at desc
+    offset 1
+  );
+end;
+$$;
+
+revoke execute on function public.cancel_stripe_subscription(text) from public, anon, authenticated;
+grant execute on function public.cancel_stripe_subscription(text) to service_role;
+
+-- 7c. switch_free_product — lets a free-plan user swap their one connected
+-- product for a different one, at most once every 6 months. Rejects the
+-- swap (rather than silently no-op-ing) if the cooldown hasn't elapsed or
+-- the account isn't actually on the free plan, so the client can show a
+-- real error instead of guessing.
+create or replace function public.switch_free_product(p_new_slug text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  current_plan text;
+  last_switch timestamptz;
+begin
+  select plan_id, last_free_switch_at into current_plan, last_switch
+  from public.subscriptions
+  where user_id = auth.uid();
+
+  if current_plan <> 'free' then
+    raise exception 'switch_free_product is only for free-plan accounts; paid plans manage products directly.';
+  end if;
+
+  if last_switch is not null and now() - last_switch < interval '6 months' then
+    raise exception 'You can only switch your free product once every 6 months. Next switch available %.',
+      to_char(last_switch + interval '6 months', 'YYYY-MM-DD');
+  end if;
+
+  delete from public.entitlements where user_id = auth.uid();
+
+  insert into public.entitlements (user_id, product_slug)
+  values (auth.uid(), p_new_slug);
+
+  update public.subscriptions
+  set last_free_switch_at = now(), updated_at = now()
+  where user_id = auth.uid();
 end;
 $$;
 
