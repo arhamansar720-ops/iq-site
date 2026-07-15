@@ -79,7 +79,7 @@ export default function ProductPageContent({
 
       {/* STATS */}
       <section className="relative py-16 border-t border-line">
-        <div className="mx-auto max-w-5xl px-6 md:px-10 grid grid-cols-3 gap-4">
+        <div className="mx-auto max-w-5xl px-6 md:px-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {product.stats.map((s) => (
             <motion.div
               key={s.label}

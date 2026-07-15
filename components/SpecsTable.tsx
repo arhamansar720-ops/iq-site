@@ -23,10 +23,10 @@ export default function SpecsTable({ specs }: { specs: { label: string; value: s
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-5%" }}
               transition={{ duration: 0.5, delay: i * 0.06 }}
-              className="flex items-center justify-between px-6 py-4"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 px-6 py-4"
             >
               <span className="text-sm text-mute">{s.label}</span>
-              <span className="text-sm text-ivory text-right">{s.value}</span>
+              <span className="text-sm text-ivory sm:text-right">{s.value}</span>
             </motion.div>
           ))}
         </div>
