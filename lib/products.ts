@@ -1,4 +1,4 @@
-export type ProductVariant = "habits" | "drive" | "commute" | "receipts" | "life" | "finance" | "valet" | "rx" | "savings";
+export type ProductVariant = "habits" | "drive" | "commute" | "receipts" | "life" | "finance" | "valet" | "rx" | "savings" | "nutrition";
 
 export type Product = {
   slug: string;
@@ -797,8 +797,104 @@ export const PRODUCTS: Product[] = [
     ],
   },
   {
-    slug: "iqsavings",
+    slug: "iqnutrition",
     index: 9,
+    name: "IQNutrition",
+    category: "Nutrition Intelligence",
+    status: "live",
+    tagline: "Log what you ate in plain words. Get the full picture back.",
+    description:
+      "Describe a meal in a sentence, snap a photo, or scan a barcode — IQNutrition turns it into calories, macros and micronutrients, then shows the week, month and year around it.",
+    longDescription:
+      "Most food trackers make you do the data entry and hand you a wall of charts in return. IQNutrition flips that. You type what you ate the way you'd say it out loud, it fills in the numbers, and the payoff is a calm calorie ring plus honest trends — adherence, weekday patterns, weight direction, and a maintenance estimate calculated from your own intake, not a formula.",
+    features: [
+      "Plain-language meal logging",
+      "Photo & barcode capture",
+      "Calorie ring + full macros",
+      "Insights from your own data",
+      "Plan, check-in & fasting tools",
+    ],
+    featureDetails: [
+      "Write \"two eggs, sourdough toast with butter, black coffee\" and IQNutrition estimates calories, protein, carbs, fat, fiber, sugar and sodium — no database scrolling, no manual macro math.",
+      "Point the camera at a plate and an on-device model names the food before anything leaves your phone; scan a barcode and it pulls the exact label from Open Food Facts.",
+      "The day is one ring: calories in, calories left, macros underneath, with fiber / sugar / sodium totals against reference targets.",
+      "Week, month and year views plus an Insights tab: calorie and protein adherence, average by weekday, a least-squares weight trend, and an estimated maintenance (TDEE) derived from intake vs. weight change.",
+      "Describe your goal in a sentence and the AI builds a calorie + protein plan; a weekly check-in reads how the week actually went; an optional eating-window timer tracks fasting.",
+    ],
+    stats: [
+      { label: "Nutrition IQ", value: "82" },
+      { label: "Avg. log time", value: "4s" },
+      { label: "Views", value: "5" },
+    ],
+    variant: "nutrition",
+    problem: {
+      headline: "You know what you ate. The app makes you prove it.",
+      body: "Every other tracker turns a 10-second meal into a two-minute search-and-tap chore, then buries the result in charts nobody opens twice. IQNutrition takes the sentence you'd say anyway, fills in the numbers, and spends its effort on the part that matters — what the trend is actually doing.",
+    },
+    howItWorks: {
+      title: "How IQNutrition actually works",
+      steps: [
+        {
+          title: "Say what you ate",
+          body: "Type it in plain words, snap a photo, or scan a barcode — whichever is fastest for that meal.",
+        },
+        {
+          title: "It fills in the numbers",
+          body: "Calories and the full macro + micro breakdown come back in seconds, editable if the portion was off.",
+        },
+        {
+          title: "The day is one ring",
+          body: "Calories left, protein to go, water and micros — the whole day readable at a glance.",
+        },
+        {
+          title: "Trends do the thinking",
+          body: "Insights turns weeks of logs into adherence, weekday patterns, weight direction and a maintenance estimate from your own data.",
+        },
+      ],
+    },
+    signature: {
+      eyebrow: "The signature feature",
+      title: "A maintenance number from your data, not a calculator.",
+      body: "Most apps hand you a TDEE from a formula the day you sign up and never revisit it. IQNutrition waits until it has enough of your own logs and weigh-ins, then works backward from what you actually ate versus how your weight moved — so the number to eat around is measured, not guessed, and it updates as you do.",
+      stat: { value: "TDEE", label: "Estimated from intake vs. weight change" },
+    },
+    underTheHood: {
+      title: "Built to make logging cheap and trends honest",
+      bullets: [
+        "Meal estimation runs server-side for hard cases and streams its reasoning; a keyless on-device model handles photo recognition before anything is uploaded.",
+        "Every date is anchored to a single timezone so the day never flips at 11 PM, on the web or in the app.",
+        "The weight trend is a least-squares fit, not last-minus-first, so a single heavy morning doesn't swing the line.",
+      ],
+    },
+    integration: {
+      title: "Feeds IQHabits and IQLife",
+      body: "Nutrition adherence, protein, and weight direction become signals IQHabits folds into your Health IQ and IQLife factors into today's plan — right alongside sleep, driving and spending.",
+      links: ["iqhabits", "iqlife"],
+    },
+    specs: [
+      { label: "Platform", value: "iOS, Web" },
+      { label: "Capture", value: "Text, on-device photo, barcode" },
+      { label: "Views", value: "Day, Week, Month, Year, Insights" },
+      { label: "Data storage", value: "Synced to your account" },
+    ],
+    faq: [
+      {
+        q: "How is this different from IQHabits?",
+        a: "IQHabits is the single health score across food, sleep and movement. IQNutrition is the dedicated food tool underneath it — deeper logging, micronutrients, and nutrition-specific trends — and it feeds IQHabits when both are connected.",
+      },
+      {
+        q: "Do photos of my food get uploaded?",
+        a: "No. Photo recognition runs on your device; only the recognised food names are used to build the estimate.",
+      },
+      {
+        q: "Do I have to weigh and measure everything?",
+        a: "No. You describe the meal in normal language and adjust the portion if the estimate looks off — precision is optional, consistency is the point.",
+      },
+    ],
+  },
+  {
+    slug: "iqsavings",
+    index: 10,
     name: "IQSavings",
     category: "Savings Intelligence",
     status: "soon",

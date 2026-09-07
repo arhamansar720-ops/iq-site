@@ -44,6 +44,12 @@ function Icon({ name }: { name: string }) {
           <path d="M8.6 1.5L3.2 8.8h3.6l-.9 5.7 5.9-7.8H8.2l.4-5.2z" stroke={ACCENT} strokeWidth="1.2" strokeLinejoin="round" />
         </svg>
       );
+    case "flame":
+      return (
+        <svg {...common}>
+          <path d="M8 1.8c.6 2.2-.6 3.2-1.7 4.3C5 7.4 4 8.6 4 10.2a4 4 0 108 0c0-1.7-.9-3-1.6-4-.5.5-1 .8-1.6.9.8-1.8.6-3.7-.8-5.3z" stroke={ACCENT} strokeWidth="1.2" strokeLinejoin="round" />
+        </svg>
+      );
     case "dollar":
       return (
         <svg {...common}>
@@ -148,6 +154,15 @@ const APP_META: Record<
       { icon: "pill", title: "Morning", sub: "2 prescriptions", value: "Taken" },
       { icon: "bolt", title: "Delivery", sub: "out for delivery", value: "38m" },
       { icon: "pill", title: "Prescriptions tracked", sub: "all active", value: "5" },
+    ],
+  },
+  nutrition: {
+    icon: "flame",
+    ring: { value: "82", label: "NUTRITION IQ", pct: 0.71 },
+    rows: [
+      { icon: "flame", title: "Chicken burrito bowl", sub: "Logged from a photo", value: "812 cal" },
+      { icon: "bolt", title: "Protein", sub: "128 g of 180 g", value: "71%" },
+      { icon: "heart", title: "7-day adherence", sub: "days at / under goal", value: "86%" },
     ],
   },
 };

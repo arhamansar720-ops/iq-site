@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 
 const NODES = [
-  { id: "habits", label: "IQHabits", x: 18, y: 12 },
+  { id: "habits", label: "IQHabits", x: 16, y: 12 },
+  { id: "nutrition", label: "IQNutrition", x: 37, y: 13 },
   { id: "drive", label: "IQDrive", x: 18, y: 42 },
   { id: "commute", label: "IQCommute", x: 18, y: 72 },
   { id: "receipts", label: "IQReceipts", x: 18, y: 96 },
@@ -16,6 +17,8 @@ const NODES = [
 
 const LINKS: [string, string][] = [
   ["habits", "life"],
+  ["nutrition", "habits"],
+  ["nutrition", "life"],
   ["drive", "life"],
   ["commute", "life"],
   ["receipts", "finance"],
