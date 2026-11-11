@@ -3,6 +3,9 @@
 import { motion, motionValue, type MotionValue } from "framer-motion";
 import { useEffect, useRef } from "react";
 import InstrumentCard from "./InstrumentCard";
+import BlurHeadline from "./fx/BlurHeadline";
+import MagnetWrap from "./fx/MagnetWrap";
+import Rotator from "./fx/Rotator";
 
 const CARDS = [
   { label: "Health IQ", score: 84, top: "8%", left: "4%", delay: 0.1, drift: 1 },
@@ -103,8 +106,32 @@ export default function Hero() {
       });
     }
 
+    // Only simulate while it can actually be seen: desktop layout (cards are
+    // lg-only), hero on screen, tab visible, and motion allowed.
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let onScreen = true;
+    let started = false;
+    let running = false;
+
+    function shouldRun() {
+      return started && !cancelled && desktop.matches && !reduced.matches && onScreen && !document.hidden;
+    }
+    function sync() {
+      const want = shouldRun();
+      if (want && !running) {
+        running = true;
+        measure();
+        last = performance.now();
+        raf = window.requestAnimationFrame(tick);
+      } else if (!want && running) {
+        running = false;
+        window.cancelAnimationFrame(raf);
+      }
+    }
+
     function tick(now: number) {
-      if (cancelled) return;
+      if (cancelled || !running) return;
       const dt = Math.min(now - last, 32) / 1000;
       last = now;
       const a0 = anchor.current;
@@ -208,18 +235,35 @@ export default function Hero() {
       raf = window.requestAnimationFrame(tick);
     }
 
+    const io = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      sync();
+    });
+    if (heroRef.current) io.observe(heroRef.current);
+    const onResize = () => {
+      if (running) measure();
+      sync();
+    };
+    document.addEventListener("visibilitychange", sync);
+    desktop.addEventListener("change", sync);
+    reduced.addEventListener("change", sync);
+    window.addEventListener("resize", onResize);
+
     // wait for the entrance animation to settle before measuring/starting
     const id = window.setTimeout(() => {
-      measure();
-      last = performance.now();
-      raf = window.requestAnimationFrame(tick);
+      started = true;
+      sync();
     }, 1600);
-    window.addEventListener("resize", measure);
     return () => {
       cancelled = true;
+      running = false;
       window.clearTimeout(id);
       window.cancelAnimationFrame(raf);
-      window.removeEventListener("resize", measure);
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+      desktop.removeEventListener("change", sync);
+      reduced.removeEventListener("change", sync);
+      window.removeEventListener("resize", onResize);
     };
     // physics/cardElRefs are stable refs created once — intentionally omitted
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -295,14 +339,20 @@ export default function Hero() {
       </div>
 
       <div ref={textRef} className="relative z-10 w-full mx-auto max-w-5xl px-6 md:px-10 text-center pt-24">
-        <motion.h1
-          initial={{ opacity: 0, y: 18 }}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="font-display text-balance text-[2.25rem] leading-[1.15] sm:text-6xl sm:leading-[1.05] md:text-7xl lg:text-[5.25rem] tracking-tight text-ivory"
+          transition={{ duration: 0.6 }}
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-line bg-white/[0.03] px-4 py-1.5 text-xs text-mute"
         >
-          Intelligence for everyday life.
-        </motion.h1>
+          <span className="h-1.5 w-1.5 rounded-full bg-signal animate-pulseDot" />
+          Smarter
+          <Rotator words={["driving.", "spending.", "health.", "commutes.", "habits.", "living."]} className="text-ivory" />
+        </motion.div>
+
+        <h1 className="font-display text-balance text-[2.25rem] leading-[1.15] sm:text-6xl sm:leading-[1.05] md:text-7xl lg:text-[5.25rem] tracking-tight text-ivory">
+          <BlurHeadline text="Intelligence for everyday life." className="justify-center" />
+        </h1>
 
         <motion.p
           initial={{ opacity: 0, y: 18 }}
@@ -320,12 +370,14 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.34 }}
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <a
-            href="#products"
-            className="inline-flex items-center justify-center rounded-full bg-ivory text-void text-sm font-medium px-7 py-3.5 hover:bg-signal transition-colors duration-300 w-full sm:w-auto"
-          >
-            Explore Products
-          </a>
+          <MagnetWrap className="w-full sm:w-auto">
+            <a
+              href="#products"
+              className="inline-flex items-center justify-center rounded-full bg-ivory text-void text-sm font-medium px-7 py-3.5 hover:bg-signal hover:shadow-[0_0_40px_-6px_rgba(174,189,242,0.7)] transition-[background-color,box-shadow] duration-300 w-full sm:w-auto"
+            >
+              Explore Products
+            </a>
+          </MagnetWrap>
           <a
             href="#ecosystem"
             className="inline-flex items-center justify-center rounded-full border border-line text-ivory text-sm font-medium px-7 py-3.5 hover:border-signal/50 hover:bg-white/5 transition-colors duration-300 w-full sm:w-auto"

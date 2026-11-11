@@ -64,12 +64,12 @@ export default function InstrumentCard({
     >
       <motion.div
         ref={cardRef}
-        style={externallyDriven ? { x: motionX, y: motionY, zIndex: 20 } : undefined}
-        animate={externallyDriven ? undefined : { y: [0, -14, 0] }}
-        transition={
+        // the idle bob is a CSS keyframe (compositor-only) rather than an
+        // infinite JS-driven framer loop
+        style={
           externallyDriven
-            ? undefined
-            : { duration: 6, repeat: Infinity, ease: "easeInOut", delay: drift * 0.15 }
+            ? { x: motionX, y: motionY, zIndex: 20 }
+            : { animationDelay: `${drift * 0.15}s` }
         }
         drag={draggable}
         dragConstraints={dragConstraintsRef}
@@ -84,7 +84,7 @@ export default function InstrumentCard({
         }}
         whileDrag={{ scale: 1.08, boxShadow: "0 20px 40px rgba(0,0,0,0.35)" }}
         whileHover={draggable ? { scale: 1.03 } : undefined}
-        className={`relative w-[156px] rounded-2xl glass px-4 py-3.5 overflow-hidden ${
+        className={`relative w-[156px] rounded-2xl glass px-4 py-3.5 overflow-hidden ${externallyDriven ? "" : "animate-float"} ${
           draggable ? "cursor-grab active:cursor-grabbing pointer-events-auto" : ""
         }`}
       >

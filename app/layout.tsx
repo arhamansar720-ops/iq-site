@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import Sparks from "@/components/fx/Sparks";
 
 const grotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -48,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${grotesk.variable} ${inter.variable} ${mono.variable}`}>
       <body className="font-body antialiased bg-void text-ivory selection:bg-signal/20">
-        {children}
+        <Sparks>{children}</Sparks>
       </body>
     </html>
   );

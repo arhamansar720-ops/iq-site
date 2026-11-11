@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Shiny from "./fx/Shiny";
 
 const LINKS = [
   { label: "Products", href: "/#products" },
@@ -9,7 +10,7 @@ const LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-line py-16 md:py-20">
+    <footer className="relative border-t border-line py-16 md:py-20 overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 md:px-10 flex flex-col md:flex-row md:items-end md:justify-between gap-10">
         <div>
           <Link href="/#top" className="font-display text-2xl text-ivory mb-3 inline-block">IQ</Link>
@@ -30,6 +31,11 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6 md:px-10 mt-12 pt-8 border-t border-line flex flex-col md:flex-row gap-3 justify-between text-xs text-mute">
         <span>&copy; {new Date().getFullYear()} IQ. All rights reserved.</span>
         <span>Built with intelligence, for intelligence.</span>
+      </div>
+
+      {/* oversized wordmark with a sweeping shine */}
+      <div aria-hidden className="pointer-events-none select-none mt-10 -mb-[0.32em] text-center font-display font-bold leading-none tracking-tighter text-[38vw] md:text-[24vw] opacity-60">
+        <Shiny speed={5}>IQ</Shiny>
       </div>
     </footer>
   );
